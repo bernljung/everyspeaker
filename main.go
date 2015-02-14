@@ -28,16 +28,14 @@ func (r Response) String() (s string) {
 func start() {
 	for range time.Tick(100 * time.Millisecond) {
 		if len(toSay) > 0 {
-			if ok := toSay[0].Download(); ok {
-				toSay[0].Play()
-				toSay = toSay[1:]
-			}
+			toSay[0].Play()
+			toSay = toSay[1:]
 		}
 	}
 }
 
 func queue(tl, q string) {
-	t := tts.TTS{Filename: filename, Tl: tl, Q: q}
+	t := tts.TTS{Tl: tl, Q: q}
 	toSay = append(toSay, t)
 }
 
