@@ -9,8 +9,6 @@ import (
 	"time"
 )
 
-const filename = "temp.mp3"
-
 var toSay []tts.TTS
 
 type Response map[string]interface{}
