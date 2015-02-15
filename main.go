@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bernljung/tts"
+	"github.com/bernljung/go-tts"
 	"log"
 	"net/http"
 	"time"
@@ -37,13 +37,13 @@ func queue(tl, q string) {
 	toSay = append(toSay, t)
 }
 
-func queueHandler(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
-	if r.Method == "POST" {
+func queueHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method == "GET" {
 		go queue(r.URL.Query()["tl"][0], r.URL.Query()["q"][0])
-		fmt.Fprint(rw, Response{"success": true, "message": "Queued"})
+		fmt.Fprint(w, Response{"success": true, "message": "Queued"})
 	} else {
-		fmt.Fprint(rw, Response{"success": false, "message": "Use post"})
+		http.NotFound(w, r)
 	}
 }
 
