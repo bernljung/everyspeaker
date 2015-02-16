@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/bernljung/go-tts"
 	"log"
@@ -37,18 +38,30 @@ func queue(tl, q string) {
 	toSay = append(toSay, t)
 }
 
-func queueHandler(w http.ResponseWriter, r *http.Request) {
+func handler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method == "GET" {
-		go queue(r.URL.Query()["tl"][0], r.URL.Query()["q"][0])
-		fmt.Fprint(w, Response{"success": true, "message": "Queued"})
+	if r.Method == "POST" {
+		q := r.FormValue("q")
+		tl := r.FormValue("tl")
+		if q != "" && tl != "" && (tl == "sv" || tl == "en") {
+			go queue(tl, q)
+			fmt.Fprint(w, Response{"success": true, "message": "Queued"})
+		} else {
+			fmt.Fprint(w, Response{"success": false, "message": "You know what you did... I need q and tl."})
+		}
 	} else {
 		http.NotFound(w, r)
 	}
 }
 
 func main() {
+	port := flag.Int("port", 8000, "port number")
+	flag.Parse()
 	go start()
-	http.HandleFunc("/queue", queueHandler)
-	log.Fatal(http.ListenAndServe(":8001", nil))
+	http.HandleFunc("/post", handler)
+
+	message := fmt.Sprintf("Starting server on :%v", *port)
+	log.Println(message)
+	address := fmt.Sprintf(":%v", *port)
+	log.Fatal(http.ListenAndServe(address, nil))
 }
