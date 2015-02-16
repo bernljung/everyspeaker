@@ -43,7 +43,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		q := r.FormValue("q")
 		tl := r.FormValue("tl")
-		if q != "" && tl != "" && (tl == "sv" || tl == "en") {
+		if q != "" && (tl == "sv" || tl == "en") {
 			go queue(tl, q)
 			fmt.Fprint(w, Response{"success": true, "message": "Queued"})
 		} else {
