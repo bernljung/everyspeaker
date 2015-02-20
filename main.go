@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/bernljung/go-tts"
@@ -11,18 +10,6 @@ import (
 )
 
 var toSay []tts.TTS
-
-type Response map[string]interface{}
-
-func (r Response) String() (s string) {
-	b, err := json.Marshal(r)
-	if err != nil {
-		s = ""
-		return
-	}
-	s = string(b)
-	return
-}
 
 func start() {
 	for range time.Tick(100 * time.Millisecond) {
@@ -45,9 +32,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		tl := r.FormValue("tl")
 		if q != "" && (tl == "sv" || tl == "en") {
 			go queue(tl, q)
-			fmt.Fprint(w, Response{"success": true, "message": "Queued"})
+			fmt.Fprint(w, Response{Success: true, Message: "Queued"})
 		} else {
-			fmt.Fprint(w, Response{"success": false, "message": "You know what you did... I need q and tl."})
+			fmt.Fprint(w, Response{Success: false, Message: "You know what you did... I need q and tl."})
 		}
 	} else {
 		http.NotFound(w, r)
