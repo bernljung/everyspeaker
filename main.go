@@ -10,6 +10,7 @@ import (
 )
 
 var toSay []tts.TTS
+var VALID_LANGS = [...]string{"af", "de", "en", "es", "fi", "fr", "is", "la", "no", "ru", "sv"}
 
 func start() {
 	for range time.Tick(100 * time.Millisecond) {
@@ -30,9 +31,15 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		q := r.FormValue("q")
 		tl := r.FormValue("tl")
-		if q != "" && (tl == "sv" || tl == "en") {
-			go queue(tl, q)
-			fmt.Fprint(w, Response{Success: true, Message: "Queued"})
+
+		if q != "" {
+			for i := 0; i < len(VALID_LANGS); i++ {
+				if tl == VALID_LANGS[i] {
+					go queue(tl, q)
+					fmt.Fprint(w, Response{Success: true, Message: "Queued"})
+					return
+				}
+			}
 		} else {
 			fmt.Fprint(w, Response{Success: false, Message: "You know what you did... I need q and tl."})
 		}
